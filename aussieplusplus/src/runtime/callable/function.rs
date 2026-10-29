@@ -41,8 +41,8 @@ impl AussieCallable for Function {
 impl Display for Function {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::UserDefined(func) => write!(f, "{}", func.to_string()),
-            Self::BuiltIn(b) => write!(f, "{}", b.to_string()),
+            Self::UserDefined(func) => write!(f, "{}", func),
+            Self::BuiltIn(b) => write!(f, "{}", b),
         }
     }
 }
@@ -91,6 +91,6 @@ impl AussieCallable for UserDefined {
 
 impl Display for UserDefined {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.decl.to_string())
+        write!(f, "{}", self.decl)
     }
 }

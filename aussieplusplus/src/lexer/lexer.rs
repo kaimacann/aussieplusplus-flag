@@ -372,14 +372,13 @@ impl<'a, T: Source> Lexer<T> {
     }
 
     fn eat_nah_or_yeah_or_ident(&mut self, first: char, kind: Kind) -> Result<Kind> {
-        let res: Result<Kind> = match self.eat_keyword(kind, false) {
+        match self.eat_keyword(kind, false) {
             Err(_) => self.eat_identifier(first),
             Ok(kind) => {
                 self.peek_adv(',');
                 Ok(kind)
             }
-        };
-        res
+        }
     }
 
     fn eat_reckon_or_fully_reckon(&mut self, first: char) -> Result<Kind> {
@@ -391,11 +390,10 @@ impl<'a, T: Source> Lexer<T> {
     }
 
     fn eat_keyword_or_ident(&mut self, first: char, kind: Kind) -> Result<Kind> {
-        let res: Result<Kind> = match self.eat_keyword(kind, true) {
+        match self.eat_keyword(kind, true) {
             Err(_) => self.eat_identifier(first),
             Ok(kind) => Ok(kind),
-        };
-        res
+        }
     }
 
     fn eat_keyword(&mut self, kind: Kind, expect_separator: bool) -> Result<Kind> {
