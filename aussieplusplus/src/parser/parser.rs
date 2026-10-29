@@ -475,7 +475,7 @@ impl Parser {
             Kind::RightBoomerang | Kind::GTE | Kind::LeftBoomerang | Kind::LTE
         ) {
             let kind = self.advance().kind();
-            let op: Option<BinaryOp> = kind.clone().into();
+            let op: Option<BinaryOp> = kind.into();
 
             let right = match self.term() {
                 Ok(term) => term,
