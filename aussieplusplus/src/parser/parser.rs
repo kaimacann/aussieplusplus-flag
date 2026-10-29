@@ -604,8 +604,6 @@ impl Parser {
                 Expr::Grouping(Box::new(expr))
             }
             k => {
-                // self.current -= 1;
-                // panic!("k: {:?}", k);
                 return Err(ParseError::ExpectPrimary(line, k).into());
             }
         };
@@ -663,15 +661,6 @@ impl Parser {
         self.tokens[self.current].clone()
     }
 
-    /// Peek `n` tokens ahead
-    fn peek_n(&self, n: usize) -> Token {
-        if self.current + n >= self.tokens.len() {
-            self.tokens[self.tokens.len() - 1].clone()
-        } else {
-            self.tokens[self.current + n].clone()
-        }
-    }
-
     fn advance(&mut self) -> Token {
         if !self.is_at_end() {
             self.current += 1;
@@ -681,10 +670,6 @@ impl Parser {
 
     fn previous(&self) -> Token {
         self.tokens[self.current - 1].clone()
-    }
-
-    fn back(&mut self, pos: usize) {
-        self.current = pos;
     }
 
     fn is_at_end(&self) -> bool {
