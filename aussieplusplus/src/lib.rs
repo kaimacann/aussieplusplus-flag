@@ -12,20 +12,7 @@ pub mod token;
 pub mod upside_down;
 
 pub fn interpret(src: &str) -> Result<()> {
-    let mut lex = lexer::Lexer::new(lexer::source::Regular::new(src.chars()));
-    let (tokens, _) = lex.lex();
-
-    let mut parser = parser::parser::Parser::new(tokens);
-    let mut stmts = parser.parse()?;
-
-    if Resolver::new().resolve(&mut stmts) {
-        return Ok(());
-    }
-
-    let mut iptr = Interpreter::new();
-    iptr.interpret(stmts)?;
-
-    Ok(())
+    interpret_source(lexer::source::Regular::new(src.chars()))
 }
 
 pub fn interpret_repl(src: &str, interpreter: &mut Interpreter, parser: &mut Parser) -> Result<()> {
@@ -43,18 +30,22 @@ pub fn interpret_repl(src: &str, interpreter: &mut Interpreter, parser: &mut Par
 }
 
 pub fn interpret_upside_down(src: &str) -> Result<()> {
-    let mut lex = lexer::Lexer::new(lexer::source::UpsideDown::new(src.chars()));
+    interpret_source(lexer::source::UpsideDown::new(src.chars()))
+}
+
+fn interpret_source<T: lexer::source::Source>(source: T) -> Result<()> {
+    let mut lex = lexer::Lexer::new(source);
     let (tokens, _) = lex.lex();
 
-    let mut parser = parser::parser::Parser::new(tokens);
+    let mut parser = Parser::new(tokens);
     let mut stmts = parser.parse()?;
 
     if Resolver::new().resolve(&mut stmts) {
         return Ok(());
     }
 
-    let mut iptr = Interpreter::new();
-    iptr.interpret(stmts)?;
+    let mut interpreter = Interpreter::new();
+    interpreter.interpret(stmts)?;
 
     Ok(())
 }
