@@ -1,12 +1,39 @@
-# UTS Cyber Security Challenge
+# Aussie++ Flag
 
-A UTS Cyber Security challenge from down unda, written in Aussie++.
+Two Aussie++ source examples draw the Australian flag, and a Rust interpreter crate runs the examples. The sample currently prints a celebratory message after execution.
 
-Learn more about Aussie++ in the [Vercel documentation](https://aussieplusplus.vercel.app/).
+## Getting started
 
-The bundled interpreter supports the playground’s upside-down mode:
+Install Rust and Cargo. From `aussieplusplus/`, run:
 
 ```sh
-cargo run --manifest-path aussieplusplus/Cargo.toml --bin flip -- flag-right-side-up.aussie > flag.aussie
-cargo run --manifest-path aussieplusplus/Cargo.toml --bin aussie_plus_plus -- --upside-down flag.aussie
+cargo run -- ../flag.aussie
 ```
+
+Cargo builds and runs the interpreter; it prints `CHEERS C***!` after this sample executes.
+
+### Commands
+
+From `aussieplusplus/`, run `cargo fmt` and `cargo test`.
+
+## Security and Limitations
+
+The repository contains example source and an interpreter; it does not declare a license. The sample's output includes profanity.
+
+## Structure
+
+`aussieplusplus/` is the Rust crate and binary. `flag.aussie` and `flag-right-side-up.aussie` are runnable source examples.
+
+## References
+
+- [Rust crate manifest](aussieplusplus/Cargo.toml)
+- [Flag source](flag.aussie)
+- [Right-side-up source](flag-right-side-up.aussie)
+
+## Contributing
+
+Keep example changes runnable with the interpreter.
+
+## Credits and license
+
+No repository license file or crate license declaration is present. Ask the maintainer about reuse terms.
