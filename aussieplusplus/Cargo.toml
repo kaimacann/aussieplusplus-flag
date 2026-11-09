@@ -9,7 +9,6 @@ name = "aussie_plus_plus"
 [dependencies]
 ahash = "0.7.6"
 anyhow = "1.0.44"
-arrayvec = "0.7.1"
 itertools = "0.10.1"
 rand = "0.8.4"
 thiserror = "1.0.29"
