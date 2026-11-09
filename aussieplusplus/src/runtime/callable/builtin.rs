@@ -36,11 +36,26 @@ impl BuiltIn {
             "hitthesack" => Some(BuiltIn::Sleep(Sleep::default())),
             "gimmetime" => Some(BuiltIn::Time(Time::default())),
             "chucksomedice" => Some(BuiltIn::Rand(Rand::default())),
-            "length" => Some(BuiltIn::StringOp(StringOp::new("Length", StringOpKind::Length))),
-            "charat" => Some(BuiltIn::StringOp(StringOp::new("CharAt", StringOpKind::CharAt))),
-            "insertchar" => Some(BuiltIn::StringOp(StringOp::new("InsertChar", StringOpKind::InsertChar))),
-            "reverse" => Some(BuiltIn::StringOp(StringOp::new("Reverse", StringOpKind::Reverse))),
-            "shuffle" => Some(BuiltIn::StringOp(StringOp::new("Shuffle", StringOpKind::Shuffle))),
+            "length" => Some(BuiltIn::StringOp(StringOp::new(
+                "Length",
+                StringOpKind::Length,
+            ))),
+            "charat" => Some(BuiltIn::StringOp(StringOp::new(
+                "CharAt",
+                StringOpKind::CharAt,
+            ))),
+            "insertchar" => Some(BuiltIn::StringOp(StringOp::new(
+                "InsertChar",
+                StringOpKind::InsertChar,
+            ))),
+            "reverse" => Some(BuiltIn::StringOp(StringOp::new(
+                "Reverse",
+                StringOpKind::Reverse,
+            ))),
+            "shuffle" => Some(BuiltIn::StringOp(StringOp::new(
+                "Shuffle",
+                StringOpKind::Shuffle,
+            ))),
             _ => None,
         }
     }
@@ -87,14 +102,26 @@ impl Display for BuiltIn {
 }
 
 #[derive(Clone, Copy, PartialEq, Debug)]
-pub enum StringOpKind { Length, CharAt, InsertChar, Reverse, Shuffle }
+pub enum StringOpKind {
+    Length,
+    CharAt,
+    InsertChar,
+    Reverse,
+    Shuffle,
+}
 
 #[derive(Clone, PartialEq, Debug)]
-pub struct StringOp { name: Rc<str>, kind: StringOpKind }
+pub struct StringOp {
+    name: Rc<str>,
+    kind: StringOpKind,
+}
 
 impl StringOp {
     fn new(name: &str, kind: StringOpKind) -> Self {
-        Self { name: Rc::from(name), kind }
+        Self {
+            name: Rc::from(name),
+            kind,
+        }
     }
 
     fn text(args: &[Value], index: usize) -> anyhow::Result<String> {
@@ -117,7 +144,10 @@ impl AussieCallable for StringOp {
         let value = Self::text(args, 0)?;
         match self.kind {
             StringOpKind::Length => Ok(Value::Number(value.chars().count() as f64)),
-            StringOpKind::CharAt => value.chars().nth(Self::number(args, 1)?).map(|ch| Value::String(ch.to_string()))
+            StringOpKind::CharAt => value
+                .chars()
+                .nth(Self::number(args, 1)?)
+                .map(|ch| Value::String(ch.to_string()))
                 .ok_or_else(|| RuntimeError::General("character index out of range".into()).into()),
             StringOpKind::InsertChar => {
                 let index = Self::number(args, 1)?;
@@ -149,7 +179,9 @@ impl AussieCallable for StringOp {
         }
     }
 
-    fn name(&self) -> &Rc<str> { &self.name }
+    fn name(&self) -> &Rc<str> {
+        &self.name
+    }
 }
 
 #[derive(Clone, PartialEq, Debug)]

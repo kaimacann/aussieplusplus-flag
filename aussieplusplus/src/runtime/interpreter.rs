@@ -99,9 +99,7 @@ impl<'a> Interpreter<'a> {
                         let callable = Value::Callable(Rc::new(builtin.into()));
                         let canonical = callable.clone();
                         self.env.borrow_mut().define(name, canonical);
-                        self.env.borrow_mut().define(
-                            lower_name, callable,
-                        );
+                        self.env.borrow_mut().define(lower_name, callable);
                     }
                 };
                 Ok(None)

@@ -7,13 +7,13 @@ A UTS Cyber Security challenge project with two Aussie++ examples that draw the 
 Install Rust and Cargo. From the repository root, run the right-side-up example:
 
 ```sh
-cargo run --manifest-path aussieplusplus/Cargo.toml -- flag-right-side-up.aussie
+cargo run --manifest-path aussieplusplus/Cargo.toml --bin aussie_plus_plus -- flag-right-side-up.aussie
 ```
 
 Run the upside-down example with:
 
 ```sh
-cargo run --manifest-path aussieplusplus/Cargo.toml -- --upside-down flag.aussie
+cargo run --manifest-path aussieplusplus/Cargo.toml --bin aussie_plus_plus -- --upside-down flag.aussie
 ```
 
 The interpreter prints a celebratory message after a sample executes.
