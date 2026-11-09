@@ -119,7 +119,7 @@ impl Resolver {
         }
     }
 
-    fn while_stmt(&mut self, cond: &mut ExprNode, body: &mut Vec<Stmt>) {
+    fn while_stmt(&mut self, cond: &mut ExprNode, body: &mut [Stmt]) {
         self.expr(cond.expr_mut());
         body.iter_mut().for_each(|stmt| self.stmt(stmt));
     }
@@ -209,7 +209,7 @@ impl Resolver {
 
     fn resolve_local(&mut self, var: &mut AstVar) -> Option<&mut Var> {
         for (i, scope) in self.scopes.iter_mut().rev().enumerate() {
-            if let Some(v) = scope.get_mut(&*var.name()) {
+            if let Some(v) = scope.get_mut(var.name()) {
                 var.scope_distance = i;
                 return Some(v);
             }

@@ -95,10 +95,8 @@ impl Range<f64> for (RangeBound<f64>, RangeBound<f64>) {
                 }
             }
             (RangeBound::Inclusive(start), RangeBound::Exclusive(end)) => {
-                if start < end {
+                if start != end {
                     i >= *start && i < *end
-                } else if start > end {
-                    i < *end && i >= *start
                 } else {
                     let error_margin = f64::EPSILON;
                     (i - *start).abs() < error_margin

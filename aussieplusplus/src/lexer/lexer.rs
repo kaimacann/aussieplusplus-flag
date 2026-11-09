@@ -13,7 +13,7 @@ where
     line: usize,
 }
 
-impl<'a, T: Source> Lexer<T> {
+impl<T: Source> Lexer<T> {
     pub fn new(src: T) -> Self {
         Self { src, line: 1 }
     }
@@ -203,7 +203,7 @@ impl<'a, T: Source> Lexer<T> {
                 '"' => self.eat_string()?,
 
                 _ => {
-                    if c.is_digit(10) {
+                    if c.is_ascii_digit() {
                         self.eat_number(c)?
                     } else if c == '_' || c.is_alphabetic() {
                         self.eat_identifier(c)?
@@ -222,7 +222,7 @@ impl<'a, T: Source> Lexer<T> {
         let mut has_decimal = false;
 
         while let Some(peek) = self.peek() {
-            if peek.is_digit(10) {
+            if peek.is_ascii_digit() {
                 let _ = self.next();
                 s.push(peek);
             } else if peek == '.' {
@@ -276,7 +276,7 @@ impl<'a, T: Source> Lexer<T> {
             match self.peek() {
                 None => break,
                 Some(c) => {
-                    if c.is_digit(10) || c.is_alphabetic() || c == '_' {
+                    if c.is_ascii_digit() || c.is_alphabetic() || c == '_' {
                         s.push(c);
                         let _ = self.next();
                     } else {
@@ -338,7 +338,7 @@ impl<'a, T: Source> Lexer<T> {
     fn eat_is_or_isa(&mut self, first: char) -> Result<Kind> {
         match self.eat_keyword_or_ident(first, Kind::Isa)? {
             Kind::Isa => Ok(Kind::Isa),
-            Kind::Ident(maybe_is) if maybe_is.to_ascii_lowercase() == "is" => Ok(Kind::Is),
+            Kind::Ident(maybe_is) if maybe_is.eq_ignore_ascii_case("is") => Ok(Kind::Is),
             ident => Ok(ident),
         }
     }
@@ -360,11 +360,8 @@ impl<'a, T: Source> Lexer<T> {
                 Some('\n') => {
                     self.line += 1;
                 }
-                Some('g') => {
-                    if self.eat_keyword(Kind::GotIt, true).is_ok() {
-                        break;
-                    }
-                }
+                Some('g') if self.eat_keyword(Kind::GotIt, true).is_ok() => break,
+                Some('g') => {}
                 _ => {}
             }
         }
@@ -445,7 +442,7 @@ impl<'a, T: Source> Lexer<T> {
 }
 
 // General utilities
-impl<'a, T: Source> Lexer<T> {
+impl<T: Source> Lexer<T> {
     fn next(&mut self) -> Option<char> {
         self.src.next()
     }
@@ -492,15 +489,11 @@ impl<'a, T: Source> Lexer<T> {
 
     fn peek_adv(&mut self, c: char) -> bool {
         match self.peek() {
-            Some(ch) => {
-                if ch == c {
-                    let _ = self.next();
-                    true
-                } else {
-                    false
-                }
+            Some(ch) if ch == c => {
+                let _ = self.next();
+                true
             }
-            None => false,
+            _ => false,
         }
     }
 }

@@ -1,0 +1,33 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    devDependencies:
+      '@terra-symposium/standards-quality':
+        specifier: 2.0.6
+        version: 2.0.6
+
+packages:
+
+  '@terra-symposium/standards-quality@2.0.6':
+    resolution: {integrity: sha512-SlI/MK7UNLHy6ZnKlQOEB0OYORltrTzYEN9sO/52R/YoMkmbKfqVb6Bs5z4tJvYae3ln17ETmfym8ezgsjNFcA==}
+    engines: {node: '>=18.18'}
+    hasBin: true
+
+  typescript@5.9.3:
+    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
+snapshots:
+
+  '@terra-symposium/standards-quality@2.0.6':
+    dependencies:
+      typescript: 5.9.3
+
+  typescript@5.9.3: {}

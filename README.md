@@ -27,6 +27,13 @@ cargo fmt --manifest-path aussieplusplus/Cargo.toml
 cargo test --manifest-path aussieplusplus/Cargo.toml
 ```
 
+Install Node.js and pnpm 10.30.3, then install the pinned Terra Quality CLI and run its full Rust workflow:
+
+```sh
+pnpm install
+pnpm run quality:check
+```
+
 ## Structure
 
 `aussieplusplus/` contains the Rust crate and interpreter binary. `flag.aussie` and `flag-right-side-up.aussie` are runnable source examples.

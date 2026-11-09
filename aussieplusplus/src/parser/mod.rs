@@ -1,2 +1,5 @@
+#[path = "parser.rs"]
+pub mod engine;
 pub mod error;
-pub mod parser;
+pub use engine as parser;
+pub use engine::*;

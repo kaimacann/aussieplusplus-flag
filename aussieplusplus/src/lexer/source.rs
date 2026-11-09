@@ -62,7 +62,7 @@ impl<'a> Source for UpsideDown<'a> {
             None => None,
             Some(v) => {
                 let _ = self.dummy.insert(rightside_up(*v));
-                self.dummy.as_ref().take()
+                self.dummy.as_ref()
             }
         }
     }

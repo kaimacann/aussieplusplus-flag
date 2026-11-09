@@ -1,6 +1,4 @@
 use anyhow::Result;
-use arrayvec::ArrayVec;
-use itertools::Itertools;
 use std::{
     cell::RefCell,
     fmt::Arguments,
@@ -25,7 +23,7 @@ use super::{
     environment::Environment,
     error::RuntimeError,
     exit::{Exit, ExitKind},
-    BuiltIn, Callable, RuntimePartialEq, UserDefined, Value, MAX_ARITY,
+    BuiltIn, Callable, RuntimePartialEq, UserDefined, Value,
 };
 
 pub struct Interpreter<'a> {
@@ -62,7 +60,7 @@ impl<'a> Interpreter<'a> {
         use std::borrow::BorrowMut;
         let w = self.writer.borrow_mut();
         if let Some(w) = w {
-            let _ = writeln!(w, "{}", args).unwrap();
+            writeln!(w, "{}", args).unwrap();
         }
         println!("{}", args);
         stdout().flush().unwrap();
@@ -330,7 +328,7 @@ impl<'a> Interpreter<'a> {
 
                 let val = match (op, right) {
                     (UnaryOp::Bang, right) => return Ok(Value::Bool(!Self::is_truthy(&right))),
-                    (UnaryOp::Minus, Value::Number(right)) => Value::Number(right * -1f64),
+                    (UnaryOp::Minus, Value::Number(right)) => Value::Number(-right),
                     (UnaryOp::Incr, Value::Number(right)) => Value::Number(right + 1f64),
                     (UnaryOp::Decr, Value::Number(right)) => Value::Number(right - 1f64),
                     _ => {

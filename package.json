@@ -1,0 +1,13 @@
+{
+	"name": "aussieplusplus-flag",
+	"private": true,
+	"packageManager": "pnpm@10.30.3",
+	"scripts": {
+		"quality": "terra-quality quality --warn",
+		"quality:check": "terra-quality quality --all --warn",
+		"quality:all": "terra-quality quality --all --warn"
+	},
+	"devDependencies": {
+		"@terra-symposium/standards-quality": "2.0.6"
+	}
+}

@@ -1,6 +1,7 @@
 mod builtin;
-mod callable;
+#[path = "callable.rs"]
+mod callable_impl;
 mod function;
 pub use builtin::*;
-pub use callable::*;
+pub use callable_impl::*;
 pub use function::*;

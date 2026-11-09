@@ -1,2 +1,5 @@
 # Rust build output
 aussieplusplus/target/
+
+# JavaScript quality tooling
+/node_modules/
