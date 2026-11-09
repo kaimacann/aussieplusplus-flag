@@ -95,8 +95,10 @@ impl Range<f64> for (RangeBound<f64>, RangeBound<f64>) {
                 }
             }
             (RangeBound::Inclusive(start), RangeBound::Exclusive(end)) => {
-                if start != end {
+                if start < end {
                     i >= *start && i < *end
+                } else if start > end {
+                    i <= *start && i > *end
                 } else {
                     let error_margin = f64::EPSILON;
                     (i - *start).abs() < error_margin
@@ -149,5 +151,20 @@ impl Range<f64> for (RangeBound<f64>, RangeBound<f64>) {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Range, RangeBound};
+
+    #[test]
+    fn descending_inclusive_to_exclusive_range_includes_start_and_excludes_end() {
+        let range = (RangeBound::Inclusive(3.0), RangeBound::Exclusive(0.0));
+
+        assert!(range.satisfied(3.0));
+        assert!(range.satisfied(2.0));
+        assert!(range.satisfied(1.0));
+        assert!(!range.satisfied(0.0));
     }
 }
