@@ -5,7 +5,9 @@
 	"scripts": {
 		"quality": "terra-quality quality --warn",
 		"quality:check": "terra-quality quality --all --warn",
-		"quality:all": "terra-quality quality --all --warn"
+		"quality:all": "terra-quality quality --all --warn",
+		"build": "cargo build --manifest-path aussieplusplus/Cargo.toml --all-targets && cargo doc --manifest-path aussieplusplus/Cargo.toml --no-deps",
+		"test": "cargo test --manifest-path aussieplusplus/Cargo.toml && cargo run --manifest-path aussieplusplus/Cargo.toml --bin aussie_plus_plus -- flag-right-side-up.aussie && cargo run --manifest-path aussieplusplus/Cargo.toml --bin aussie_plus_plus -- --upside-down flag.aussie"
 	},
 	"devDependencies": {
 		"@terra-symposium/standards-quality": "2.0.6"
