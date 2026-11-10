@@ -3,3 +3,6 @@ aussieplusplus/target/
 
 # JavaScript quality tooling
 /node_modules/
+
+# Error logs
+error.log
