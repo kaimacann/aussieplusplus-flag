@@ -22,17 +22,25 @@ struct Opt {
 }
 #[cfg(not(target_os = "emscripten"))]
 fn main() {
+    if let Err(error) = run() {
+        eprintln!("{error:#}");
+        std::process::exit(1);
+    }
+}
+
+#[cfg(not(target_os = "emscripten"))]
+fn run() -> anyhow::Result<()> {
     let opt = Opt::from_args();
     let code: String;
     if let Some(filepath) = opt.filepath {
         code = fs::read_to_string(filepath).expect("failed to read file");
         if opt.upside_down {
-            aussie_plus_plus::interpret_upside_down(code.as_str()).unwrap();
+            aussie_plus_plus::interpret_upside_down(code.as_str())?;
         } else {
-            aussie_plus_plus::interpret(code.as_str()).unwrap();
+            aussie_plus_plus::interpret(code.as_str())?;
         }
         println!("CHEERS C***!");
-        return;
+        return Ok(());
     }
 
     let stdin = io::stdin();
@@ -40,15 +48,10 @@ fn main() {
     let mut p = aussie_plus_plus::parser::parser::Parser::new(vec![]);
     for line in stdin.lock().lines() {
         let line = line.unwrap();
-        match aussie_plus_plus::interpret_repl(line.as_str(), &mut i, &mut p) {
-            Ok(stmts) => stmts,
-            Err(_) => {
-                // eprintln!("Failed to run: {}", e);
-                return;
-            }
-        };
+        aussie_plus_plus::interpret_repl(line.as_str(), &mut i, &mut p)?;
     }
     println!("CHEERS C***!");
+    Ok(())
 }
 
 #[cfg(target_os = "emscripten")]

@@ -1,5 +1,9 @@
 # Aussie++ Flag
 
+## Quality
+
+This repository contains Rust source only. Standards Quality 2.2.0 has no built-in Rust profile, so `quality.json` leaves the JavaScript and TypeScript source extensions empty and runs Rust formatting, Clippy, and `cargo check` directly. Build and functional test commands remain separate.
+
 A UTS Cyber Security challenge project with two Aussie++ examples that draw the Australian flag and a Rust interpreter crate. The interpreter supports upside-down mode. Learn more about Aussie++ in the [playground documentation](https://aussieplusplus.vercel.app/).
 
 ## Getting started

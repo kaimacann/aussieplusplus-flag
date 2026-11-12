@@ -11,8 +11,8 @@ use std::{
 
 use crate::{
     ast::{
-        BinaryOp, Expr, ExprNode, ForLoop, If, LogicalOp, Match, Pattern, Range, Stmt, UnaryOp,
-        Var, VarDecl, WhileLoop,
+        BinaryOp, Expr, ExprNode, ForLoop, If, LogicalOp, Match, Pattern, Range, RangeBound, Stmt,
+        UnaryOp, Var, VarDecl, WhileLoop,
     },
     parser::error::ParseError,
     runtime::AussieCallable,
@@ -69,7 +69,7 @@ impl<'a> Interpreter<'a> {
     pub fn interpret(&mut self, stmts: Vec<Stmt>) -> Result<()> {
         for stmt in stmts {
             match self.execute_stmt(&stmt) {
-                Err(e) => eprintln!("{}", e),
+                Err(error) => return Err(error),
                 Ok(None) => {}
                 Ok(Some(ExitKind::Break(line))) => {
                     return Err(RuntimeError::InvalidBreak(line).into())
@@ -250,8 +250,12 @@ impl<'a> Interpreter<'a> {
         let end = match self.evaluate(for_loop.range.1.expr())? {
             Value::Number(n) => n,
             other => {
-                let line = for_loop.var.line();
-                return Err(ParseError::InvalidRange(line, "start".into(), other.into()).into());
+                return Err(ParseError::InvalidRange(
+                    for_loop.var.line(),
+                    "end".into(),
+                    other.into(),
+                )
+                .into());
             }
         };
 
@@ -261,11 +265,33 @@ impl<'a> Interpreter<'a> {
         );
 
         let (mut i, _) = range.values();
+        let exclusive_start_cannot_advance = match &range.0 {
+            RangeBound::Inclusive(_) => false,
+            RangeBound::Exclusive(start) => {
+                let end = range.1.value();
+                if *start < end {
+                    i <= *start || !i.is_finite()
+                } else if *start > end {
+                    i >= *start || !i.is_finite()
+                } else {
+                    false
+                }
+            }
+        };
+        if exclusive_start_cannot_advance {
+            return Err(RuntimeError::General(
+                "range iteration stopped advancing at the current number precision".into(),
+            )
+            .into());
+        }
 
         let var_name = for_loop.var.name();
         env.define(var_name.clone(), Value::Number(i));
 
         let env = Rc::new(RefCell::new(env));
+        let single_value_range =
+            matches!(&range, (RangeBound::Inclusive(_), RangeBound::Inclusive(_)))
+                && range.0.value() == range.1.value();
 
         while range.satisfied(i) {
             match self.execute_block(&for_loop.body, env.clone())? {
@@ -273,7 +299,17 @@ impl<'a> Interpreter<'a> {
                 Some(ExitKind::Break(_)) => break,
                 Some(other) => return Ok(Some(other)),
             };
+            let previous = i;
             range.iterate(&mut i);
+            if i == previous {
+                if single_value_range {
+                    break;
+                }
+                return Err(RuntimeError::General(
+                    "range iteration stopped advancing at the current number precision".into(),
+                )
+                .into());
+            }
             env.borrow_mut().assign(var_name.clone(), Value::Number(i));
         }
 
@@ -284,11 +320,15 @@ impl<'a> Interpreter<'a> {
         let previous = mem::replace(&mut self.env, env);
 
         for stmt in stmts {
-            match self.execute_stmt(stmt)? {
-                None => {}
-                Some(s) => {
+            match self.execute_stmt(stmt) {
+                Err(error) => {
                     self.env = previous;
-                    return Ok(Some(s));
+                    return Err(error);
+                }
+                Ok(None) => {}
+                Ok(Some(exit)) => {
+                    self.env = previous;
+                    return Ok(Some(exit));
                 }
             };
         }
@@ -506,5 +546,118 @@ impl<'a> Interpreter<'a> {
             (Value::Number(a), Value::Number(b)) => Ok((a, b)),
             _ => Err((RuntimeError::new_syntax("THOSE AREN'T FUCKIN NUMBERS MATE!", line)).into()),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{cell::RefCell, rc::Rc};
+
+    use crate::{
+        ast::{Expr, ExprNode, ForLoop, RangeBound, Stmt, Var},
+        runtime::{environment::Environment, Value},
+    };
+
+    use super::Interpreter;
+
+    #[test]
+    fn restores_the_enclosing_environment_after_a_block_error() {
+        let mut interpreter = Interpreter::new();
+        let enclosing = interpreter.env.clone();
+        let block_environment = Rc::new(RefCell::new(Environment::new_with_enclosing(
+            enclosing.clone(),
+        )));
+        let missing_variable = Var::from(("missing", 1, 0));
+        let failing_statement = Stmt::Expr(ExprNode::new(Expr::Var(missing_variable), 1));
+
+        let result = interpreter.execute_block(&[failing_statement], block_environment);
+
+        assert!(result.is_err());
+        assert!(Rc::ptr_eq(&interpreter.env, &enclosing));
+    }
+
+    #[test]
+    fn equal_inclusive_range_at_precision_boundary_executes_once() {
+        let mut interpreter = Interpreter::new();
+        let count = Var::from(("count", 1, 0));
+        interpreter
+            .env
+            .borrow_mut()
+            .define(count.name().clone(), Value::Number(0.0));
+        let limit = 9_007_199_254_740_992.0;
+        let bound = || ExprNode::new(Expr::Literal(Value::Number(limit)), 1);
+        let loop_stmt = ForLoop::new(
+            Var::from(("i", 1, 0)),
+            (
+                RangeBound::Inclusive(bound()),
+                RangeBound::Inclusive(bound()),
+            ),
+            vec![Stmt::Expr(ExprNode::new(
+                Expr::Assign(
+                    count.clone(),
+                    Box::new(ExprNode::new(Expr::Literal(Value::Number(1.0)), 1)),
+                ),
+                1,
+            ))],
+        );
+
+        interpreter.execute_for_loop(&loop_stmt).unwrap();
+
+        assert_eq!(
+            interpreter.env.borrow().get("count"),
+            Some(Value::Number(1.0))
+        );
+    }
+
+    #[test]
+    fn non_singleton_range_errors_when_iteration_cannot_advance_at_current_precision() {
+        let mut interpreter = Interpreter::new();
+        let limit = 9_007_199_254_740_992.0;
+        let bound = |value| ExprNode::new(Expr::Literal(Value::Number(value)), 1);
+        let loop_stmt = ForLoop::new(
+            Var::from(("i", 1, 0)),
+            (
+                RangeBound::Inclusive(bound(limit)),
+                RangeBound::Inclusive(bound(limit + 2.0)),
+            ),
+            Vec::new(),
+        );
+
+        let result = interpreter.execute_for_loop(&loop_stmt);
+
+        let error = match result {
+            Err(error) => error,
+            Ok(_) => panic!("expected non-advancing range to return an error"),
+        };
+
+        assert!(error
+            .to_string()
+            .contains("range iteration stopped advancing"));
+    }
+
+    #[test]
+    fn exclusive_start_range_errors_when_its_first_step_cannot_advance() {
+        let mut interpreter = Interpreter::new();
+        let limit = 9_007_199_254_740_992.0;
+        let bound = |value| ExprNode::new(Expr::Literal(Value::Number(value)), 1);
+        let loop_stmt = ForLoop::new(
+            Var::from(("i", 1, 0)),
+            (
+                RangeBound::Exclusive(bound(limit)),
+                RangeBound::Inclusive(bound(limit + 2.0)),
+            ),
+            Vec::new(),
+        );
+
+        let result = interpreter.execute_for_loop(&loop_stmt);
+
+        let error = match result {
+            Err(error) => error,
+            Ok(_) => panic!("expected an error when the exclusive start cannot advance"),
+        };
+
+        assert!(error
+            .to_string()
+            .contains("range iteration stopped advancing"));
     }
 }
