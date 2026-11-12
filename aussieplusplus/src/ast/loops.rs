@@ -79,6 +79,8 @@ impl Range<f64> for (RangeBound<f64>, RangeBound<f64>) {
             *val += 1f64;
         } else if self.0.value() > self.1.value() {
             *val -= 1f64;
+        } else if matches!(self, (RangeBound::Inclusive(_), RangeBound::Inclusive(_))) {
+            *val += 1f64;
         }
     }
 
@@ -100,8 +102,7 @@ impl Range<f64> for (RangeBound<f64>, RangeBound<f64>) {
                 } else if start > end {
                     i <= *start && i > *end
                 } else {
-                    let error_margin = f64::EPSILON;
-                    (i - *start).abs() < error_margin
+                    false
                 }
             }
             (RangeBound::Exclusive(start), RangeBound::Inclusive(end)) => {
@@ -110,8 +111,7 @@ impl Range<f64> for (RangeBound<f64>, RangeBound<f64>) {
                 } else if end < start {
                     i >= *end && i < *start
                 } else {
-                    let error_margin = f64::EPSILON;
-                    (i - *end).abs() < error_margin
+                    false
                 }
             }
             (RangeBound::Exclusive(start), RangeBound::Exclusive(end)) => {
@@ -166,5 +166,89 @@ mod tests {
         assert!(range.satisfied(2.0));
         assert!(range.satisfied(1.0));
         assert!(!range.satisfied(0.0));
+    }
+
+    #[test]
+    fn equal_inclusive_to_exclusive_range_is_empty() {
+        let range = (RangeBound::Inclusive(3.0), RangeBound::Exclusive(3.0));
+
+        assert!(!range.satisfied(3.0));
+    }
+
+    #[test]
+    fn equal_exclusive_to_inclusive_range_is_empty() {
+        let range = (RangeBound::Exclusive(3.0), RangeBound::Inclusive(3.0));
+
+        assert!(!range.satisfied(3.0));
+    }
+
+    #[test]
+    fn equal_inclusive_range_advances_after_its_single_value() {
+        let range = (RangeBound::Inclusive(3.0), RangeBound::Inclusive(3.0));
+        let (mut value, _) = range.values();
+
+        assert!(range.satisfied(value));
+        range.iterate(&mut value);
+        assert!(!range.satisfied(value));
+    }
+
+    #[test]
+    fn bound_inclusivity_is_preserved_for_ascending_and_descending_ranges() {
+        let cases: Vec<(RangeBound<f64>, RangeBound<f64>, &[f64])> = vec![
+            (
+                RangeBound::Inclusive(0.0),
+                RangeBound::Inclusive(3.0),
+                &[0.0, 1.0, 2.0, 3.0],
+            ),
+            (
+                RangeBound::Inclusive(3.0),
+                RangeBound::Inclusive(0.0),
+                &[3.0, 2.0, 1.0, 0.0],
+            ),
+            (
+                RangeBound::Inclusive(0.0),
+                RangeBound::Exclusive(3.0),
+                &[0.0, 1.0, 2.0],
+            ),
+            (
+                RangeBound::Inclusive(3.0),
+                RangeBound::Exclusive(0.0),
+                &[3.0, 2.0, 1.0],
+            ),
+            (
+                RangeBound::Exclusive(0.0),
+                RangeBound::Inclusive(3.0),
+                &[1.0, 2.0, 3.0],
+            ),
+            (
+                RangeBound::Exclusive(3.0),
+                RangeBound::Inclusive(0.0),
+                &[2.0, 1.0, 0.0],
+            ),
+            (
+                RangeBound::Exclusive(0.0),
+                RangeBound::Exclusive(3.0),
+                &[1.0, 2.0],
+            ),
+            (
+                RangeBound::Exclusive(3.0),
+                RangeBound::Exclusive(0.0),
+                &[2.0, 1.0],
+            ),
+        ];
+
+        for (start, end, expected) in cases {
+            let range = (start, end);
+            let (mut current, _) = range.values();
+            let mut values = Vec::new();
+            for _ in 0..=expected.len() {
+                if !range.satisfied(current) {
+                    break;
+                }
+                values.push(current);
+                range.iterate(&mut current);
+            }
+            assert_eq!(values, expected);
+        }
     }
 }

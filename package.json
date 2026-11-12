@@ -1,15 +1,21 @@
 {
-	"name": "aussieplusplus-flag",
-	"private": true,
-	"packageManager": "pnpm@10.30.3",
-	"scripts": {
-		"quality": "terra-quality quality --warn",
-		"quality:check": "terra-quality quality --all --warn",
-		"quality:all": "terra-quality quality --all --warn",
-		"build": "cargo build --manifest-path aussieplusplus/Cargo.toml --all-targets && cargo doc --manifest-path aussieplusplus/Cargo.toml --no-deps",
-		"test": "cargo test --manifest-path aussieplusplus/Cargo.toml && cargo run --manifest-path aussieplusplus/Cargo.toml --bin aussie_plus_plus -- flag-right-side-up.aussie && cargo run --manifest-path aussieplusplus/Cargo.toml --bin aussie_plus_plus -- --upside-down flag.aussie"
-	},
-	"devDependencies": {
-		"@terra-symposium/standards-quality": "2.0.6"
-	}
+  "name": "aussieplusplus-flag",
+  "private": true,
+  "packageManager": "pnpm@10.30.3",
+  "scripts": {
+    "quality": "node scripts/terra-quality.mjs quality --warn",
+    "quality:check": "node scripts/terra-quality.mjs quality --all --warn",
+    "quality:all": "node scripts/terra-quality.mjs quality --all --warn",
+    "format:check": "prettier --check README.md package.json quality.json eslint.config.mjs 'scripts/**/*.mjs'",
+    "build": "cargo build --manifest-path aussieplusplus/Cargo.toml --all-targets && cargo doc --manifest-path aussieplusplus/Cargo.toml --no-deps",
+    "test": "cargo test --manifest-path aussieplusplus/Cargo.toml && cargo run --manifest-path aussieplusplus/Cargo.toml --bin aussie_plus_plus -- flag-right-side-up.aussie && cargo run --manifest-path aussieplusplus/Cargo.toml --bin aussie_plus_plus -- --upside-down flag.aussie"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@terra-symposium/standards-quality": "2.2.0",
+    "eslint": "^10.13.0",
+    "globals": "^16.5.0",
+    "knip": "^6.44.1",
+    "prettier": "^3.9.10"
+  }
 }
