@@ -1,5 +1,9 @@
 # Aussie++ Flag
 
+## Quality
+
+This repository contains Rust source only. Standards Quality 2.2.0 has no built-in Rust profile, so `quality.json` leaves the JavaScript and TypeScript source extensions empty and runs Rust formatting, Clippy, and `cargo check` directly. Build and functional test commands remain separate.
+
 A UTS Cyber Security challenge project with two Aussie++ examples that draw the Australian flag and a Rust interpreter crate. The interpreter supports upside-down mode. Learn more about Aussie++ in the [playground documentation](https://aussieplusplus.vercel.app/).
 
 ## Getting started
@@ -7,13 +11,13 @@ A UTS Cyber Security challenge project with two Aussie++ examples that draw the 
 Install Rust and Cargo. From the repository root, run the right-side-up example:
 
 ```sh
-cargo run --manifest-path aussieplusplus/Cargo.toml --bin aussie_plus_plus -- flag-right-side-up.aussie
+cargo run --manifest-path Cargo.toml --bin aussie_plus_plus -- samples/flag-right-side-up.aussie
 ```
 
 Run the upside-down example with:
 
 ```sh
-cargo run --manifest-path aussieplusplus/Cargo.toml --bin aussie_plus_plus -- --upside-down flag.aussie
+cargo run --manifest-path Cargo.toml --bin aussie_plus_plus -- --upside-down samples/flag.aussie
 ```
 
 The interpreter prints a celebratory message after a sample executes.
@@ -23,30 +27,30 @@ The interpreter prints a celebratory message after a sample executes.
 From the repository root:
 
 ```sh
-cargo fmt --manifest-path aussieplusplus/Cargo.toml
-cargo test --manifest-path aussieplusplus/Cargo.toml
+cargo fmt --manifest-path Cargo.toml
+cargo test --manifest-path Cargo.toml
 ```
 
 Install Node.js and pnpm 10.30.3, then install the pinned Terra Quality CLI and run its full Rust workflow:
 
 ```sh
 pnpm install
-pnpm run quality:check
+pnpm run quality:all
 ```
 
 ## Structure
 
-`aussieplusplus/` contains the Rust crate and interpreter binary. `flag.aussie` and `flag-right-side-up.aussie` are runnable source examples.
+`src/` contains the Rust interpreter. `samples/` contains the runnable flag examples.
 
 ## Limitations
 
-The repository does not declare a license. The interpreter's sample output includes profanity.
+The repository includes a private-use rights notice. The interpreter's sample output includes profanity.
 
 ## References
 
-- [Rust crate manifest](aussieplusplus/Cargo.toml)
-- [Flag source](flag.aussie)
-- [Right-side-up source](flag-right-side-up.aussie)
+- [Rust crate manifest](Cargo.toml)
+- [Flag source](samples/flag.aussie)
+- [Right-side-up source](samples/flag-right-side-up.aussie)
 
 ## Contributing
 

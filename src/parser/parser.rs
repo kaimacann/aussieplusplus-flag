@@ -77,6 +77,9 @@ impl Parser {
                 Err(e) => {
                     had_error = true;
                     eprintln!("{:?}", e);
+                    if !self.is_at_end() {
+                        self.advance();
+                    }
                 }
             }
         }
@@ -167,11 +170,20 @@ impl Parser {
 
     fn loops(&mut self, ident: Option<Ident>) -> Result<Stmt> {
         match_toks!(self,
-            _other => {
-                todo!()
-            },
+            other => Err(ParseError::ExpectedTokens(
+                vec![Kind::From, Kind::Until],
+                other,
+                self.peek().line(),
+            )
+            .into()),
             Kind::From => {
-                let ident = ident.unwrap();
+                let Some(ident) = ident else {
+                    return Err(ParseError::Any(
+                        self.peek().line(),
+                        "A range walkabout needs a loop variable".into(),
+                    )
+                    .into());
+                };
                 let start = match_toks!(self,
                     k =>
                     return Err(ParseError::ExpectedTokens(
@@ -677,5 +689,27 @@ impl Parser {
 
     fn is_at_end(&self) -> bool {
         self.peek().kind() == Kind::EOF
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn malformed_walkabout_clause_returns_a_parse_error_without_panicking() {
+        let invalid_forms = [
+            "G'DAY MATE!\nI'LL HAVE A WALKABOUT BOGUS\nCHEERS C***!",
+            "G'DAY MATE!\nI'LL HAVE A WALKABOUT FROM [0 TO 1)\nCHEERS C***!",
+        ];
+
+        for source in invalid_forms {
+            let result = std::panic::catch_unwind(|| crate::interpret(source));
+
+            assert!(result.is_ok(), "parser panicked on {:?}", source);
+            assert!(
+                result.unwrap().is_err(),
+                "accepted invalid source {:?}",
+                source
+            );
+        }
     }
 }

@@ -1,15 +1,27 @@
 {
 	"name": "aussieplusplus-flag",
+	"version": "0.1.0",
 	"private": true,
 	"packageManager": "pnpm@10.30.3",
 	"scripts": {
-		"quality": "terra-quality quality --warn",
-		"quality:check": "terra-quality quality --all --warn",
-		"quality:all": "terra-quality quality --all --warn",
-		"build": "cargo build --manifest-path aussieplusplus/Cargo.toml --all-targets && cargo doc --manifest-path aussieplusplus/Cargo.toml --no-deps",
-		"test": "cargo test --manifest-path aussieplusplus/Cargo.toml && cargo run --manifest-path aussieplusplus/Cargo.toml --bin aussie_plus_plus -- flag-right-side-up.aussie && cargo run --manifest-path aussieplusplus/Cargo.toml --bin aussie_plus_plus -- --upside-down flag.aussie"
+		"prepare": "husky config/husky",
+		"changeset": "changeset",
+		"changeset:status": "changeset status",
+		"version-packages": "changeset version && node scripts/sync-cargo-version.mjs",
+		"quality": "node \"$(git rev-parse --show-toplevel)/scripts/quality-runner.mjs\" quality",
+		"quality:all": "node \"$(git rev-parse --show-toplevel)/scripts/quality-runner.mjs\" quality --all",
+		"build": "cargo build --manifest-path Cargo.toml --all-targets && cargo doc --manifest-path Cargo.toml --no-deps",
+		"test": "cargo test --manifest-path Cargo.toml && cargo run --manifest-path Cargo.toml --bin aussie_plus_plus -- samples/flag-right-side-up.aussie && cargo run --manifest-path Cargo.toml --bin aussie_plus_plus -- --upside-down samples/flag.aussie",
+		"verify": "pnpm run quality:all && pnpm run test && pnpm run build"
 	},
 	"devDependencies": {
-		"@terra-symposium/standards-quality": "2.0.6"
+		"@changesets/cli": "3.0.3",
+		"@eslint/js": "^10.0.1",
+		"@terra-symposium/standards-quality": "2.3.7",
+		"eslint": "^10.13.0",
+		"globals": "^16.5.0",
+		"husky": "9.1.7",
+		"knip": "^6.44.1",
+		"prettier": "^3.9.10"
 	}
 }

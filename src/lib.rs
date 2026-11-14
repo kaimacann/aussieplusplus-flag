@@ -11,6 +11,14 @@ pub mod runtime;
 pub mod token;
 pub mod upside_down;
 
+fn resolve_or_error(stmts: &mut [ast::Stmt]) -> Result<()> {
+    if Resolver::new().resolve(stmts) {
+        anyhow::bail!("Resolver reported one or more errors.");
+    }
+
+    Ok(())
+}
+
 pub fn interpret(src: &str) -> Result<()> {
     let mut lex = lexer::Lexer::new(lexer::source::Regular::new(src.chars()));
     let (tokens, _) = lex.lex();
@@ -18,9 +26,7 @@ pub fn interpret(src: &str) -> Result<()> {
     let mut parser = parser::parser::Parser::new(tokens);
     let mut stmts = parser.parse()?;
 
-    if Resolver::new().resolve(&mut stmts) {
-        return Ok(());
-    }
+    resolve_or_error(&mut stmts)?;
 
     let mut iptr = Interpreter::new();
     iptr.interpret(stmts)?;
@@ -35,9 +41,7 @@ pub fn interpret_repl(src: &str, interpreter: &mut Interpreter, parser: &mut Par
     parser.reset(tokens);
     let mut stmts = parser.parse()?;
 
-    if Resolver::new().resolve(&mut stmts) {
-        return Ok(());
-    }
+    resolve_or_error(&mut stmts)?;
 
     interpreter.interpret(stmts)
 }
@@ -49,12 +53,37 @@ pub fn interpret_upside_down(src: &str) -> Result<()> {
     let mut parser = parser::parser::Parser::new(tokens);
     let mut stmts = parser.parse()?;
 
-    if Resolver::new().resolve(&mut stmts) {
-        return Ok(());
-    }
+    resolve_or_error(&mut stmts)?;
 
     let mut iptr = Interpreter::new();
     iptr.interpret(stmts)?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::interpret;
+
+    #[test]
+    fn resolver_errors_are_returned_to_the_caller() {
+        let result = interpret("G'DAY MATE!\nGIMME missing;\nCHEERS C***!");
+
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("Resolver reported"));
+    }
+
+    #[test]
+    fn runtime_statement_errors_are_returned_to_the_caller() {
+        let result = interpret("G'DAY MATE!\nIMPOHT ME FUNC NotAFunction;\nCHEERS C***!");
+
+        assert!(result.is_err());
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("CAN'T FIND THE IMPORT NotAFunction"));
+    }
 }

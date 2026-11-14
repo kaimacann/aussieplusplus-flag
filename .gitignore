@@ -1,8 +1,15 @@
 # Rust build output
-aussieplusplus/target/
+/dist/cache/cargo/
+dist/
 
 # JavaScript quality tooling
 /node_modules/
 
 # Error logs
 error.log
+
+# Generated test output
+**/tests/results/
+
+# Local generated caches and dependency links
+node_modules

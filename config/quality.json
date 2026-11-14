@@ -1,0 +1,92 @@
+{
+	"$schema": "../node_modules/@terra-symposium/standards-quality/quality.schema.json",
+	"root": ".",
+	"sourceRoots": ["."],
+	"extensions": [
+		".astro",
+		".c",
+		".cjs",
+		".cpp",
+		".cts",
+		".css",
+		".h",
+		".html",
+		".java",
+		".js",
+		".jsx",
+		".json",
+		".jsonc",
+		".md",
+		".mdx",
+		".mjs",
+		".mts",
+		".py",
+		".pyi",
+		".rs",
+		".sh",
+		".sql",
+		".toml",
+		".ts",
+		".tsx",
+		".yaml",
+		".yml"
+	],
+	"qualityCommands": [
+		{
+			"name": "rust-format-check",
+			"command": "cargo",
+			"args": ["fmt", "--manifest-path", "Cargo.toml", "--", "--check"]
+		},
+		{
+			"name": "rust-clippy",
+			"command": "cargo",
+			"args": ["clippy", "--manifest-path", "Cargo.toml", "--all-targets", "--", "-D", "warnings"]
+		}
+	],
+	"tools": {
+		"prettier": "node_modules/.bin/prettier",
+		"eslint": "node_modules/.bin/eslint",
+		"knip": "node_modules/.bin/knip"
+	},
+	"enabledChecks": {
+		"error-boundaries": true,
+		"document": true,
+		"format": true,
+		"import": true,
+		"name": true,
+		"forward": true,
+		"accessibility": true,
+		"display-name": true,
+		"performance-patterns": true,
+		"documented-commands": true,
+		"lint": true,
+		"knip": true,
+		"dead-code": true,
+		"type": true,
+		"recommend": true,
+		"command": true,
+		"diff": true,
+		"alias": true,
+		"security": true,
+		"repeated-classes": true,
+		"tailwind-canonical": true,
+		"regex-dedup": true,
+		"ui-patterns": true,
+		"ui-recommendations": true,
+		"github": true
+	},
+	"documentation": {
+		"required": {
+			"types": true,
+			"functions": true,
+			"exportedFunctions": true
+		}
+	},
+	"autofix": {
+		"document": false
+	},
+	"security": {
+		"runtimeRoots": []
+	},
+	"languageProfiles": ["c", "java", "python"]
+}
