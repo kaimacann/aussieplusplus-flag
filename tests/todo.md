@@ -35,7 +35,7 @@ This checklist inventories repository-owned functions, documents, and configurat
 
 - [ ] File behavior: execute or compile this source, including expected output and failure handling. No direct test file is linked yet.
 
-### `scripts/terra-quality.mjs`
+### `scripts/hygiene.mjs`
 
 - [ ] File behavior: execute or compile this source, including expected output and failure handling. No direct test file is linked yet.
 
