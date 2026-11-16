@@ -1,57 +1,40 @@
 # Aussie++ Flag
 
-## Quality
+Aussie++ Flag lets you run two playful programs that draw the Australian flag for a university challenge.
 
-This repository contains Rust source only. Standards Quality 2.2.0 has no built-in Rust profile, so `quality.json` leaves the JavaScript and TypeScript source extensions empty and runs Rust formatting, Clippy, and `cargo check` directly. Build and functional test commands remain separate.
+## Get started
 
-A UTS Cyber Security challenge project with two Aussie++ examples that draw the Australian flag and a Rust interpreter crate. The interpreter supports upside-down mode. Learn more about Aussie++ in the [playground documentation](https://aussieplusplus.vercel.app/).
-
-## Getting started
-
-Install Rust and Cargo. From the repository root, run the right-side-up example:
+Install Rust and Cargo. From the repository root, run either example:
 
 ```sh
-cargo run --manifest-path Cargo.toml --bin aussie_plus_plus -- samples/flag-right-side-up.aussie
+cargo run --bin aussie_plus_plus -- samples/flag-right-side-up.aussie
+cargo run --bin aussie_plus_plus -- --upside-down samples/flag.aussie
 ```
 
-Run the upside-down example with:
+The interpreter prints a celebratory message after a sample executes. See the [Aussie++ playground](https://aussieplusplus.vercel.app/) for the language.
 
-```sh
-cargo run --manifest-path Cargo.toml --bin aussie_plus_plus -- --upside-down samples/flag.aussie
-```
+## Validation
 
-The interpreter prints a celebratory message after a sample executes.
+| Command                | Checks                        |
+| ---------------------- | ----------------------------- |
+| `pnpm run quality`     | Changed and untracked files   |
+| `pnpm run quality:all` | Full configured Quality scope |
+| `cargo test`           | Rust unit tests               |
+| `pnpm run test`        | Project test suite            |
+| `pnpm run build`       | Build output                  |
 
-## Development
+Quality can apply safe fixes; review the diff before committing. No separate browser or Playwright test command is defined here.
 
-From the repository root:
-
-```sh
-cargo fmt --manifest-path Cargo.toml
-cargo test --manifest-path Cargo.toml
-```
-
-Install Node.js and pnpm 10.30.3, then install the pinned Terra Quality CLI and run its full Rust workflow:
-
-```sh
-pnpm install
-pnpm run quality:all
-```
-
-## Structure
-
-`src/` contains the Rust interpreter. `samples/` contains the runnable flag examples.
-
-## Limitations
-
-The repository includes a private-use rights notice. The interpreter's sample output includes profanity.
-
-## References
-
-- [Rust crate manifest](Cargo.toml)
-- [Flag source](samples/flag.aussie)
-- [Right-side-up source](samples/flag-right-side-up.aussie)
+Quality also runs Rust formatting, Clippy, and `cargo check`.
 
 ## Contributing
 
-Keep example changes runnable with the interpreter.
+`src/` contains the interpreter and `samples/` contains the runnable examples. Open a pull request against `development` and review the results of [`repository-check.yml`](.github/workflows/repository-check.yml) before merging. Keep unrelated changes out of the pull request.
+
+## Documentation
+
+- [Rust crate manifest](Cargo.toml)
+- [Flag source](samples/flag.aussie)
+- [Right-side-up example](samples/flag-right-side-up.aussie)
+
+The sample output includes profanity. See [LICENSE](LICENSE) for the private-use rights notice.
