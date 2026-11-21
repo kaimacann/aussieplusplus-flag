@@ -1,4 +1,12 @@
 #!/usr/bin/env node
+/**
+ * scripts/quality-runner.mjs
+ */
+
+/*//////////////////////////////////////////////////
+IMPORTS
+//////////////////////////////////////////////////*/
+
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
@@ -9,16 +17,14 @@ const script = fileURLToPath(import.meta.url);
 const root = dirname(dirname(script));
 const cwd = resolve(process.cwd());
 const packagePath = relative(root, cwd);
-if (packagePath.startsWith('..' + sep) || packagePath === '..') {
-	throw new Error(`Quality must run inside ${root}`);
-}
-const repositoryPackage = packagePath === '' || packagePath === 'config';
+if (packagePath.startsWith('..' + sep) || packagePath === '..') throw new Error(`Quality must run inside ${root}`);
+const repoPackage = packagePath === '' || packagePath === 'config';
 const baseConfig = [join(root, 'quality.json'), join(root, 'config/quality.json')].find(existsSync);
 if (!baseConfig) throw new Error(`Missing quality.json in ${root}`);
 const args = process.argv.slice(2).filter(arg => arg !== '--');
 
 if (process.env.QUALITY_RUNNER_SCOPE_ONLY === '1') {
-	console.log(JSON.stringify({ root, package: packagePath || '.', scope: repositoryPackage ? 'repository' : 'package', config: baseConfig, args }));
+	console.log(JSON.stringify({ root, package: packagePath || '.', scope: repoPackage ? 'repository' : 'package', config: baseConfig, args }));
 	process.exit(0);
 }
 
@@ -34,7 +40,7 @@ if ((repoName === 'uni' || repoName === 'standards') && process.env.QUALITY_RUNN
 const raw = JSON.parse(readFileSync(baseConfig, 'utf8'));
 raw.root = root;
 raw.configRoot = existsSync(join(root, 'config')) ? join(root, 'config') : root;
-const generatedLinks = [];
+const genLinks = [];
 const scan = [root];
 const pruned = new Set(['.git', 'node_modules', 'dist', 'target', '.venv', 'vendor']);
 while (scan.length) {
@@ -42,18 +48,20 @@ while (scan.length) {
 	for (const entry of readdirSync(dir, { withFileTypes: true })) {
 		const path = join(dir, entry.name);
 		if (entry.isSymbolicLink()) {
-			if (raw.extensions?.some(ext => entry.name.endsWith(ext)) && statSync(path, { throwIfNoEntry: false })?.isDirectory()) generatedLinks.push(relative(root, path));
+			if (raw.extensions?.some(ext => entry.name.endsWith(ext)) && statSync(path, { throwIfNoEntry: false })?.isDirectory()) genLinks.push(relative(root, path));
 		} else if (entry.isDirectory() && !pruned.has(entry.name)) scan.push(path);
 	}
 }
-raw.skippedFiles = [...new Set([...(raw.skippedFiles ?? []), 'scripts/quality-runner.mjs', ...generatedLinks])];
-const isBuildOrTest = entry => {
-	const name = String(entry.name ?? '').toLowerCase();
-	const argv = (entry.args ?? []).map(String);
-	return /(^|[^a-z])(build|test)([^a-z]|$)/.test(name) || argv.some(arg => /^(?:test(?::.*)?|build(?::.*)?|docs:build)$/.test(arg));
-};
+raw.skippedFiles = [...new Set([...(raw.skippedFiles ?? []), ...genLinks])];
+/**
+ * Keeps build and test commands outside the source-hygiene pass so they run in their own gates.
+ * @param entry Configured quality command with a name and arguments.
+ * @return Whether the command belongs to the build or test gate.
+ */
+const isBuildOrTest = entry =>
+	/(^|[^a-z])(build|test)([^a-z]|$)/.test(String(entry.name ?? '').toLowerCase()) || (entry.args ?? []).map(String).some(arg => /^(?:test(?::.*)?|build(?::.*)?|docs:build)$/.test(arg));
 raw.qualityCommands = (raw.qualityCommands ?? []).filter(entry => !isBuildOrTest(entry));
-if (!repositoryPackage) {
+if (!repoPackage) {
 	raw.sourceRoots = [packagePath];
 	raw.includeRoots = [];
 	raw.lintRoots = [packagePath];
@@ -78,16 +86,15 @@ const configPath = join(tempDir, 'quality.json');
 writeFileSync(configPath, JSON.stringify(raw));
 try {
 	let modulePath;
-	if (repoName === 'standards' && existsSync(join(root, 'packages/hygiene/dist/lib/runner.js'))) {
-		modulePath = join(root, 'packages/hygiene/dist/lib/runner.js');
-	} else {
+	if (repoName === 'standards' && existsSync(join(root, 'packages/hygiene/dist/lib/runner.js'))) modulePath = join(root, 'packages/hygiene/dist/lib/runner.js');
+	else {
 		for (const manifest of [join(cwd, 'package.json'), join(root, 'package.json'), join(root, 'config/package.json')]) {
 			if (!existsSync(manifest)) continue;
 			try {
 				modulePath = createRequire(manifest).resolve('@terra-symposium/hygiene/cli');
 				break;
-			} catch (error) {
-				if (error.code !== 'MODULE_NOT_FOUND') throw error;
+			} catch (err) {
+				if (err.code !== 'MODULE_NOT_FOUND') throw err;
 			}
 		}
 	}

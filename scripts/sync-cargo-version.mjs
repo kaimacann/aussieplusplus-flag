@@ -1,3 +1,10 @@
+/**
+ * scripts/sync-cargo-version.mjs
+ */
+/*//////////////////////////////////////////////////
+IMPORTS
+//////////////////////////////////////////////////*/
+
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 const VERSION_S_S_M_REGEX = /^version\s*=\s*"[^"]+"/m;

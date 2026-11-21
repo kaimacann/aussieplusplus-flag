@@ -14,8 +14,8 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.14.0(jiti@2.7.0))
       '@terra-symposium/hygiene':
-        specifier: ^2.4.5
-        version: 2.4.5(eslint@10.14.0(jiti@2.7.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^2.5.5
+        version: 2.5.5(eslint@10.14.0(jiti@2.7.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       eslint:
         specifier: ^10.13.0
         version: 10.14.0(jiti@2.7.0)
@@ -442,8 +442,8 @@ packages:
       react: '>=18'
       react-dom: '>=18'
 
-  '@terra-symposium/hygiene@2.4.5':
-    resolution: { integrity: sha512-G8pHsIMjuPiL3pnmx9Uzfbul5wdAAFMlJquOAulvzk49fM2cd5pPR74IeY0DSa+vDvZPEKv067loSYUdk8g2CA== }
+  '@terra-symposium/hygiene@2.5.5':
+    resolution: { integrity: sha512-5+JHonrwcp4hoitwDjp9ax00OTCl2tKvPs+5AmPIf8DTlt8uvOlRGywKvb8Eehpe7Jv2ig5lItxJLVN2I5MMlw== }
     engines: { node: '>=18.18' }
     hasBin: true
     peerDependencies:
@@ -1199,7 +1199,7 @@ snapshots:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
-  '@terra-symposium/hygiene@2.4.5(eslint@10.14.0(jiti@2.7.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@terra-symposium/hygiene@2.5.5(eslint@10.14.0(jiti@2.7.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@terra-symposium/boundaries': 0.2.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       typescript: 5.9.3
