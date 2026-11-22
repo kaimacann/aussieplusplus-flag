@@ -12,7 +12,9 @@
 		"quality:all": "node \"$(git rev-parse --show-toplevel)/scripts/quality-runner.mjs\" quality --all",
 		"build": "cargo build --manifest-path Cargo.toml --all-targets && cargo doc --manifest-path Cargo.toml --no-deps",
 		"test": "cargo test --manifest-path Cargo.toml && cargo run --manifest-path Cargo.toml --bin aussie_plus_plus -- samples/flag-right-side-up.aussie && cargo run --manifest-path Cargo.toml --bin aussie_plus_plus -- --upside-down samples/flag.aussie",
-		"verify": "pnpm run quality:all && pnpm run test && pnpm run build"
+		"verify": "pnpm run quality:all && pnpm run test && pnpm run build",
+		"skills:prepare": "terra-skills prepare",
+		"skills:check": "terra-skills check"
 	},
 	"devDependencies": {
 		"@changesets/cli": "3.0.3",
@@ -22,6 +24,7 @@
 		"globals": "^16.5.0",
 		"husky": "9.1.7",
 		"knip": "^6.44.1",
-		"prettier": "^3.9.10"
+		"prettier": "^3.9.10",
+		"@terra-symposium/skills": "0.1.2"
 	}
 }

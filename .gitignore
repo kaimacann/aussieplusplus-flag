@@ -13,3 +13,6 @@ error.log
 
 # Local generated caches and dependency links
 node_modules
+
+# Generated agent skills
+/.agents/skills/
