@@ -19,12 +19,12 @@
 	"devDependencies": {
 		"@changesets/cli": "3.0.3",
 		"@eslint/js": "^10.0.1",
-		"@terra-symposium/hygiene": "^2.5.8",
+		"@terra-symposium/hygiene": "^2.5.9",
 		"eslint": "^10.13.0",
 		"globals": "^16.5.0",
 		"husky": "9.1.7",
 		"knip": "^6.44.1",
 		"prettier": "^3.9.10",
-		"@terra-symposium/skills": "0.1.2"
+		"@terra-symposium/skills": "0.1.3"
 	}
 }
